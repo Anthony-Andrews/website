@@ -3,7 +3,7 @@ import { join, dirname } from "path"
 import { fileURLToPath } from "url"
 
 const root = join(fileURLToPath(import.meta.url), "../..")
-const patchDir = join(root, "patches/quartz-plugins")
+const patchDir = join(root, "local-plugins/quartz-plugins")
 const pluginDir = join(root, ".quartz/plugins")
 
 const patches = [
