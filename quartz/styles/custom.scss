@@ -1,0 +1,513 @@
+@use "./variables.scss" as *;
+
+// ─── Dark mode background gradient ───────────────────────────────────────────
+// Gradient on html so it underlies everything. background-attachment:fixed pins
+// it to the viewport — the gradient spans full width regardless of any
+// max-width on inner containers.
+// background-color #000 is the overscroll rubber-band fallback — pure black
+// so it blends with the gradient end rather than showing as distinct grey.
+html[saved-theme="dark"] {
+  background: linear-gradient(to right, #0f0f0f, #000000) fixed !important;
+  background-color: #000000 !important;
+}
+
+html[saved-theme="dark"] body,
+html[saved-theme="dark"] body[data-slug] {
+  background: transparent !important;
+}
+
+html[saved-theme="dark"] body[data-slug] div#quartz-root,
+html[saved-theme="dark"] body[data-slug] div#quartz-root.page,
+html[saved-theme="dark"] body[data-slug] .page > div#quartz-body,
+html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.center,
+html[saved-theme="dark"] body[data-slug] .page > div#quartz-body footer {
+  background-color: transparent !important;
+}
+
+// Sidebars — desktop only so the mobile explorer overlay keeps its background.
+// Explicit fixed gradient so the sidebar matches the html gradient in normal mode.
+// In reader mode (html[reader-mode=on]), fixed gradient mis-renders due to the
+// Shadeflow grid layout; use transparent instead and let the html show through.
+@media all and (min-width: 801px) {
+  html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar,
+  html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.left,
+  html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.left:has(.explorer),
+  html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.left .explorer .explorer-content,
+  html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.right {
+    background: linear-gradient(to right, #0f0f0f, #000000) fixed !important;
+    background-color: #000000 !important;
+  }
+
+  // In reader mode the sidebar has opacity:0→1 which creates a GPU compositing
+  // layer that breaks background-attachment:fixed. backdrop-filter:blur lets the
+  // html gradient show through unchanged while obscuring the article text behind.
+  // Extra [reader-mode] attr selector (presence) raises specificity above all
+  // general-rule variants including :has(.explorer).
+  // Reader mode: JS (fixReaderModeSidebars in terminalCursorScript) sets the
+  // correct scroll-positioned gradient and clears child backgrounds via inline
+  // !important, which beats all stylesheet rules. This CSS block is a no-op
+  // first-pass that fires before JS runs (sidebar is opacity:0 at that point
+  // anyway so the flash is invisible).
+  html[saved-theme="dark"][reader-mode=on][reader-mode] body[data-slug] .page > div#quartz-body div.sidebar.left,
+  html[saved-theme="dark"][reader-mode=on][reader-mode] body[data-slug] .page > div#quartz-body div.sidebar.right {
+    background: transparent !important;
+  }
+}
+
+// ─── Graph view ──────────────────────────────────────────────────────────────
+
+:root[saved-theme="light"] {
+  --graph-border: #d0d0d0;
+  --graph-node-current: #e07b39;
+  --graph-node-visited: #f4a261;
+  --graph-node-unvisited: #f7c49a;
+  --graph-link: #b0b0b0;
+}
+
+:root[saved-theme="dark"] {
+  --graph-border: #2a2a2a;
+  --graph-node-current: #7b97aa;
+  --graph-node-visited: #84a59d;
+  --graph-node-unvisited: #646464;
+  --graph-link: #606060;
+}
+
+// Panel: no separate background (inherits page color), thin visible border
+.graph > .graph-outer {
+  border-color: var(--graph-border) !important;
+}
+
+// Full-screen modal uses the page background color
+.global-graph-container {
+  background-color: var(--light) !important;
+  border-color: var(--graph-border) !important;
+}
+
+// ─── Toolbar buttons (darkmode + reader mode) ─────────────────────────────────
+// Icons use mask-image + background:var(--quartz-icon-color) via Shadeflow.
+// brightness(0) = pure black; brightness(2) pushes muted gray to white.
+
+.darkmode,
+.readermode {
+  border-radius: 4px;
+  cursor: pointer !important;
+  transition: filter 0.2s, opacity 0.2s !important;
+}
+
+html[saved-theme="light"] .darkmode,
+html[saved-theme="light"] .readermode {
+  opacity: 0.5 !important;
+  filter: none !important;
+}
+
+html[saved-theme="light"] .darkmode:hover,
+html[saved-theme="light"] .readermode:hover {
+  opacity: 1 !important;
+  filter: brightness(0) !important;
+}
+
+html[saved-theme="dark"] .darkmode,
+html[saved-theme="dark"] .readermode {
+  opacity: 0.5 !important;
+  filter: none !important;
+}
+
+html[saved-theme="dark"] .darkmode:hover,
+html[saved-theme="dark"] .readermode:hover {
+  opacity: 1 !important;
+  filter: brightness(2) !important;
+}
+
+// ─── Tooltips ─────────────────────────────────────────────────────────────────
+// The shadeflow theme applies mask-image to the buttons themselves, which clips
+// any ::after pseudo-element to the icon shape. Tooltips are placed on the
+// parent wrapper element using :has() to avoid this.
+
+@keyframes tooltip-appear {
+  to { opacity: 1; }
+}
+
+@mixin tooltip-base {
+  position: absolute;
+  background-color: var(--darkgray);
+  color: var(--light);
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0;
+  animation: tooltip-appear 0.01s 1.0s forwards;
+}
+
+// Toolbar buttons: tooltip appears above, centered on the flex wrapper div
+div:has(> .darkmode:hover) {
+  position: relative;
+  &::after {
+    @include tooltip-base;
+    content: "Toggle theme";
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+div:has(> .readermode:hover) {
+  position: relative;
+  &::after {
+    @include tooltip-base;
+    content: "Reader mode";
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+// Graph icon tooltip — inside .graph-outer (position:relative, overflow:hidden)
+.graph > .graph-outer:has(.global-graph-icon:hover)::after {
+  @include tooltip-base;
+  content: "Global graph";
+  top: 30px;
+  right: 4px;
+}
+
+// Copy button tooltip — pre is position:relative, button is top-right corner
+pre:has(> .clipboard-button:hover)::after {
+  @include tooltip-base;
+  content: "Copy";
+  top: 0.35rem;
+  right: 2.2rem;
+}
+
+// ─── Graph view heading ───────────────────────────────────────────────────────
+// The graph plugin's h3 is removed from source but may be reinstated by git pull;
+// hide it unconditionally as a permanent override.
+.graph > h3 {
+  display: none;
+}
+
+// ─── Page title prompt marker ─────────────────────────────────────────────────
+// The terminal-cursor plugin (local-plugins/terminal-cursor) injects the span;
+// CSS lives here so lightningcss layer wrapping doesn't affect keyframe scoping.
+// Disable the plugin in quartz.config.yaml to stop the span from being injected
+// (these CSS rules then have no target and are inert).
+// step-end applied between three keyframes: opacity 1 for [0,50%), 0 for [50%,100%)
+// Produces a clean square wave without the alternate-direction inversion bug.
+@keyframes blink-cursor {
+  0%   { opacity: 0; }
+  50%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.page-title::before {
+  content: ">";
+  color: #f4a261;
+  font-family: inherit;
+  font-size: 0.9em;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.terminal-cursor {
+  color: #f4a261;
+  font-family: inherit;
+  font-size: 0.65em;
+  font-weight: 600;
+  vertical-align: 0.1em;
+  opacity: 0;
+}
+
+.page-title:hover .terminal-cursor {
+  animation: blink-cursor 1s step-end infinite;
+}
+
+html[saved-theme="dark"] .page-title::before,
+html[saved-theme="dark"] .terminal-cursor {
+  color: #4caf50;
+}
+
+// ─── Sidebar header fonts ─────────────────────────────────────────────────────
+// base.scss sets h1-h6 to var(--headerFont) = "Times New Roman", system-ui, ...
+// Both the explorer and contacts headers need an explicit override here (in the
+// compiled main stylesheet) so they win the cascade over the base rule.
+button.desktop-explorer h2,
+button.contacts-toggle h2 {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+  font-weight: normal;
+  font-size: 1.2rem;
+  display: inline-block;
+  margin: 0;
+}
+
+// ─── Folder page list ─────────────────────────────────────────────────────────
+ul.section-ul > li {
+  margin-bottom: 1.25rem !important;
+}
+
+ul.section-ul .tags li {
+  margin-bottom: 0 !important;
+}
+
+ul.section-ul .desc h3 {
+  font-size: 0.9rem !important;
+}
+
+ul.section-ul .desc h3 a {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+ul.section-ul .tags {
+  font-size: 0.75rem !important;
+}
+
+ul.section-ul .tags a.internal {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Folder index description text ───────────────────────────────────────────
+// When a folder index.md has no body, Quartz renders the frontmatter description
+// as a raw text node inside .markdown-preview-view.markdown-rendered, inheriting
+// Times New Roman. This sets it to Arial explicitly.
+.markdown-preview-view.markdown-rendered {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Breadcrumb spacing ───────────────────────────────────────────────────────
+.breadcrumb-container {
+  margin-bottom: 1.5rem !important;
+}
+
+// ─── Horizontal rule ─────────────────────────────────────────────────────────
+// Shadeflow uses html[saved-theme] body hr { border-top-width:0; margin:0 }
+// Match that specificity to override it.
+html[saved-theme] .center hr {
+  border: none !important;
+  border-top: 1px solid var(--lightgray) !important;
+  margin: 2rem 0 !important;
+}
+
+// ─── Figcaption styling ───────────────────────────────────────────────────────
+.center figcaption {
+  font-size: 0.8rem !important;
+  text-align: center !important;
+  color: var(--gray) !important;
+  margin-top: 0.4rem !important;
+}
+
+// ─── Hide content-meta via cssclasses: [no-meta] in frontmatter ──────────────
+// cssclasses apply to <article>; content-meta is a beforeBody sibling, so use
+// :has() to reach up to the shared .center container.
+.center:has(article.no-meta) .content-meta {
+  display: none !important;
+}
+
+// ─── Article title → content spacing ─────────────────────────────────────────
+.article-title {
+  margin-bottom: 1.5rem !important;
+}
+
+body[data-slug="index"] .article-title {
+  display: none !important;
+}
+
+body[data-slug="index"] .center h1,
+body[data-slug="index"] .center h2 {
+  font-family: "Times New Roman", serif !important;
+}
+
+body[data-slug="index"] .center hr {
+  border: none !important;
+  margin: 2.5rem 0 !important;
+}
+
+// ─── Rounded corners on all images ───────────────────────────────────────────
+img {
+  border-radius: 4px;
+}
+
+// ─── Explorer active page/folder highlight ────────────────────────────────────
+.explorer-content ul li > a.active {
+  color: #f4a261 !important;
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+html[saved-theme="dark"] .explorer-content ul li > a.active {
+  color: #4caf50 !important;
+}
+
+.explorer-content a.folder-button.active,
+.explorer-content button.folder-button.active {
+  color: #f4a261 !important;
+  opacity: 1 !important;
+  font-weight: 600 !important;
+}
+
+html[saved-theme="dark"] .explorer-content a.folder-button.active,
+html[saved-theme="dark"] .explorer-content button.folder-button.active {
+  color: #4caf50 !important;
+}
+
+// ─── Explorer and contacts item fonts ─────────────────────────────────────────
+// Explorer folder/file names use var(--headerFont) = Times New Roman by default.
+// Contacts list uses the plugin's own font stack.
+// Override all left-column item text to Arial/system-ui.
+.explorer-content ul li > a,
+.folder-container div > a,
+.folder-container div > button span,
+.contacts-list li a {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Light mode body text color ───────────────────────────────────────────────
+// Paragraph text resolves to var(--gray) = #a3a3a3; override to darker value.
+// Callout p/li are excluded via the reset below so --color still applies there.
+html[saved-theme="light"] .center p,
+html[saved-theme="light"] .center li,
+html[saved-theme="light"] .center td {
+  color: #4a4a4a !important;
+}
+
+html[saved-theme="light"] .center .callout p,
+html[saved-theme="light"] .center .callout li {
+  color: var(--color) !important;
+}
+
+// ─── List font ────────────────────────────────────────────────────────────────
+.center ul li,
+.center ol li {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Article heading fonts ────────────────────────────────────────────────────
+.center h3,
+.center h4,
+.center h5,
+.center h6 {
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Internal link icons ─────────────────────────────────────────────────────
+// ↗ appended to wikilinks/markdown links in article body only (.center scopes it
+// away from sidebar nav, explorer, breadcrumbs, etc.)
+.center a.internal:not(.tag)::after {
+  content: " ↗";
+  font-size: 0.7em;
+  opacity: 0.45;
+  vertical-align: 0.15em;
+}
+
+.center a.internal:not(.tag):has(> img)::after {
+  content: none;
+}
+
+// ─── Blockquote left spacing ──────────────────────────────────────────────────
+// Exclude .callout — those are also blockquotes but have their own layout.
+blockquote:not(.callout) {
+  padding-left: 1.5rem !important;
+  margin-left: 1rem !important;
+}
+
+// ─── Tag pill sizing ──────────────────────────────────────────────────────────
+// Tags are a.internal.tag-link. More left padding for the # prefix, tighter
+// vertical padding to shorten the pill. ul.section-ul .tags a.internal
+// (higher specificity + !important) still overrides this in section listings.
+a.internal.tag-link {
+  display: inline-block !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.35rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  line-height: 1.3 !important;
+  background-color: transparent !important;
+}
+
+// ─── Table of contents — match explorer styling ───────────────────────────────
+button.toc-header {
+  cursor: default !important;
+  h3 {
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+    font-size: 1.2rem !important;
+    font-weight: normal !important;
+  }
+  .fold {
+    transition: transform 0.35s ease !important;
+  }
+}
+
+button.contacts-toggle {
+  cursor: default !important;
+}
+
+ul.toc-content {
+  li a {
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+// ─── Popover title spacing ────────────────────────────────────────────────────
+// The hover preview popover (shown when hovering a tag/page link) needs the
+// title pushed down from the popover edge.
+.popover .popover-inner .article-title {
+  margin-top: 1rem !important;
+}
+
+// ─── Explorer file-style folders ──────────────────────────────────────────────
+// To make a folder appear as a plain file (no expand chevron, file-link styling),
+// add its path (data-folderpath value = "slug/index") to the selector list below.
+// Example: projects/lux → data-folderpath is "projects/lux/index"
+//
+// To find the right path: right-click the folder in the explorer → Inspect,
+// look for data-folderpath on the .folder-container element.
+
+// ─── Explorer file-icon folders ───────────────────────────────────────────────
+// Add  tags: [file-icon]  to a folder's index.md frontmatter to make it appear
+// as a plain file link in the explorer (no folder chevron, normal text weight).
+// Expand/collapse still works. JS (applyFileIconFolders) stamps data-file-icon.
+
+.folder-container[data-file-icon="true"] {
+  .folder-icon { display: none !important; }
+  > div > a,
+  > div > button,
+  > div > button span {
+    color: var(--dark) !important;
+    font-weight: normal !important;
+    opacity: 0.75;
+  }
+  > div > a:hover,
+  > div > button span:hover {
+    opacity: 1 !important;
+  }
+}
+
+// Hide the file-icon tag from all display surfaces
+a.internal.tag-link[href$="/file-icon"],
+li:has(> a.internal.tag-link[href$="/file-icon"]) {
+  display: none !important;
+}
+
+// ─── Explorer collapse clipping fix (desktop) ─────────────────────────────────
+// The plugin collapses via overflow-y:hidden + flex-basis which also clips h2
+// horizontally in some browser/stacking contexts. Replace with display:none on
+// the content so the header button is never inside a clipped container.
+@media all and (min-width: 801px) {
+  .sidebar.left {
+    overflow: hidden;
+  }
+  .explorer.collapsed {
+    flex: 0 1 auto !important;
+    overflow: visible !important;
+  }
+  .explorer .explorer-content,
+  .explorer .explorer-content ul {
+    max-height: 80vh !important;
+    overflow: hidden !important;
+    transition: max-height 0.3s ease !important;
+  }
+  .explorer.collapsed .explorer-content,
+  .explorer.collapsed .explorer-content ul {
+    max-height: 0 !important;
+  }
+}

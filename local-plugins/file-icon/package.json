@@ -1,0 +1,39 @@
+{
+  "name": "@custom/file-icon",
+  "version": "0.1.0",
+  "description": "Show file icon in explorer for folders tagged with file-icon in frontmatter.",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "quartz": {
+    "name": "file-icon",
+    "displayName": "File Icon Folders",
+    "category": "component",
+    "version": "0.1.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 12,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "FileIcon": {
+        "displayName": "File Icon Folders",
+        "defaultPosition": "left",
+        "defaultPriority": 12
+      }
+    }
+  }
+}

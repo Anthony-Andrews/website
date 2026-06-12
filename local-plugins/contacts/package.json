@@ -1,0 +1,39 @@
+{
+  "name": "@custom/contacts",
+  "version": "0.1.0",
+  "description": "Contacts section component for the left sidebar.",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "quartz": {
+    "name": "contacts",
+    "displayName": "Contacts",
+    "category": "component",
+    "version": "0.1.0",
+    "quartzVersion": ">=5.0.0",
+    "dependencies": [],
+    "defaultOrder": 60,
+    "defaultEnabled": true,
+    "defaultOptions": {},
+    "components": {
+      "Contacts": {
+        "displayName": "Contacts",
+        "defaultPosition": "left",
+        "defaultPriority": 60
+      }
+    }
+  }
+}
