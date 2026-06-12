@@ -11,6 +11,8 @@ const patches = [
   "graph/dist/components/index.js",
   "table-of-contents/dist/components/index.js",
   "table-of-contents/dist/index.js",
+  "quartz-themes/dist/index.js",
+  "quartz-themes/dist/themes/shadeflow.json",
 ]
 
 for (const file of patches) {
