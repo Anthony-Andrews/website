@@ -1,5 +1,5 @@
 ---
-title: About this site
+title: this site
 description: This site itself was a project.
 tags:
   - project

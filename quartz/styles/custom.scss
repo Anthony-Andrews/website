@@ -322,7 +322,7 @@ body[data-slug="index"] .center hr {
 }
 
 // ─── Rounded corners on all images ───────────────────────────────────────────
-img {
+img, video {
   border-radius: 4px;
 }
 
@@ -386,6 +386,24 @@ html[saved-theme="light"] .center .callout li {
 .center h5,
 .center h6 {
   font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif !important;
+}
+
+// ─── Heading links ────────────────────────────────────────────────────────────
+// When heading text is a markdown link, the <a> gets link color/underline.
+// Inherit heading appearance instead, suppress ↗ icon, and hide Quartz's
+// duplicate anchor SVG (role="anchor") since the heading text is already a link.
+.center h1, .center h2, .center h3, .center h4, .center h5, .center h6 {
+  > a:not([role="anchor"]) {
+    color: inherit !important;
+    font-weight: inherit !important;
+    font-family: inherit !important;
+    text-decoration: none !important;
+    opacity: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    &::after { content: none !important; }
+    &:hover { color: inherit !important; opacity: 1 !important; }
+  }
 }
 
 // ─── Internal link icons ─────────────────────────────────────────────────────
