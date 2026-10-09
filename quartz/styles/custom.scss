@@ -7,7 +7,7 @@
 // background-color #000 is the overscroll rubber-band fallback — pure black
 // so it blends with the gradient end rather than showing as distinct grey.
 html[saved-theme="dark"] {
-  background: linear-gradient(to right, #0f0f0f, #000000) fixed !important;
+  background: linear-gradient(to right, #131313, #000000) fixed !important;
   background-color: #000000 !important;
 }
 
@@ -34,7 +34,7 @@ html[saved-theme="dark"] body[data-slug] .page > div#quartz-body footer {
   html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.left:has(.explorer),
   html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.left .explorer .explorer-content,
   html[saved-theme="dark"] body[data-slug] .page > div#quartz-body div.sidebar.right {
-    background: linear-gradient(to right, #0f0f0f, #000000) fixed !important;
+    background: linear-gradient(to right, #131313, #000000) fixed !important;
     background-color: #000000 !important;
   }
 
@@ -72,77 +72,127 @@ html[saved-theme="dark"] body[data-slug] .page > div#quartz-body footer {
   --graph-link: #606060;
 }
 
-// Panel: no separate background (inherits page color), thin visible border
-.graph > .graph-outer {
-  border-color: var(--graph-border) !important;
-}
-
 // Full-screen modal uses the page background color
 .global-graph-container {
   background-color: var(--light) !important;
   border-color: var(--graph-border) !important;
 }
 
-// Graph icon: replicate styleGraphIcon() from the removed terminal-cursor plugin.
-// That function injected this CSS at runtime; it lives here now so it applies
-// in all builds regardless of which plugins are active.
+// The graph component sits in the left toolbar (quartz.config.yaml) and only its
+// global-graph button is shown. The local graph is hidden; the patched graph
+// script skips rendering containers that aren't displayed.
+// .graph-outer shrinks to wrap the button; overflow:visible lets the tooltip out.
+.graph > .graph-outer {
+  height: auto !important;
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+.graph > .graph-outer > .graph-container {
+  display: none !important;
+}
+
+// Button: undo the plugin's corner positioning and show the plugin's own
+// network-graph SVG (the site's original graph icon) instead of Shadeflow's
+// mask icon (Lucide git-fork), drawn in the same color as the other toolbar
+// icons. The SVG is filled (fill="currentColor"); stroke:none stops it picking
+// up Shadeflow's inherited icon stroke, and 20px keeps the solid glyph from
+// looking heavier than the 24px line icons beside it.
 .graph > .graph-outer > button.global-graph-icon {
-  opacity: 0 !important;
-  transition: opacity 0.2s !important;
+  position: static !important;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: transparent !important;
   mask-image: none !important;
   -webkit-mask-image: none !important;
-  background: var(--light) !important;
-  border: 1px solid var(--gray, #a3a3a3) !important;
-  border-radius: 5px !important;
+  color: var(--quartz-icon-color) !important;
+
+  > svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin: 2px !important;
+    stroke: none !important;
+  }
 }
 
-.graph > .graph-outer > button.global-graph-icon > svg {
-  display: block !important;
-  fill: var(--light) !important;
-  filter: contrast(0.3) !important;
-}
+// ─── Toolbar buttons (search + darkmode + reader mode + graph) ─────────────────
+// Icons are drawn in var(--quartz-icon-color) (muted gray, #a3a3a3): Shadeflow
+// masks it for darkmode/readermode, the search block below copies that, and the
+// graph button colors its own SVG with it (see Graph view section).
+// brightness(0) = pure black; brightness(0.6) = mid gray (~#626262);
+// brightness(2) pushes muted gray to white.
+// Search/graph rules target the button only: .search and .graph also contain
+// fixed-position popups, which opacity/filter on the wrapper would dim or re-anchor.
 
-.graph > .graph-outer:hover > button.global-graph-icon {
-  opacity: 1 !important;
-}
-
-.graph > .graph-outer > button.global-graph-icon:hover {
-  border-color: var(--secondary) !important;
-}
-
-// ─── Toolbar buttons (darkmode + reader mode) ─────────────────────────────────
-// Icons use mask-image + background:var(--quartz-icon-color) via Shadeflow.
-// brightness(0) = pure black; brightness(2) pushes muted gray to white.
-
+// display:block so no button sits on a text line box: inline-block (the button
+// default) adds descender space below the 24px icon and lifts it off-center.
 .darkmode,
-.readermode {
+.readermode,
+.search > .search-button,
+.graph .global-graph-icon {
+  display: block !important;
   border-radius: 4px;
   cursor: pointer !important;
   transition: filter 0.2s, opacity 0.2s !important;
 }
 
 html[saved-theme="light"] .darkmode,
-html[saved-theme="light"] .readermode {
-  opacity: 0.5 !important;
-  filter: none !important;
+html[saved-theme="light"] .readermode,
+html[saved-theme="light"] .search > .search-button,
+html[saved-theme="light"] .graph .global-graph-icon {
+  opacity: 1 !important;
+  filter: brightness(0.6) !important;
 }
 
 html[saved-theme="light"] .darkmode:hover,
-html[saved-theme="light"] .readermode:hover {
+html[saved-theme="light"] .readermode:hover,
+html[saved-theme="light"] .search > .search-button:hover,
+html[saved-theme="light"] .graph .global-graph-icon:hover {
   opacity: 1 !important;
   filter: brightness(0) !important;
 }
 
 html[saved-theme="dark"] .darkmode,
-html[saved-theme="dark"] .readermode {
+html[saved-theme="dark"] .readermode,
+html[saved-theme="dark"] .search > .search-button,
+html[saved-theme="dark"] .graph .global-graph-icon {
   opacity: 0.5 !important;
   filter: none !important;
 }
 
 html[saved-theme="dark"] .darkmode:hover,
-html[saved-theme="dark"] .readermode:hover {
+html[saved-theme="dark"] .readermode:hover,
+html[saved-theme="dark"] .search > .search-button:hover,
+html[saved-theme="dark"] .graph .global-graph-icon:hover {
   opacity: 1 !important;
   filter: brightness(2) !important;
+}
+
+// Search as an icon-only button, drawn the same way as the darkmode/readermode
+// icons: a 24px Lucide "search" SVG (stroke-width 1, like Shadeflow's) as a mask
+// over the icon color. The plugin's own SVG and "Search" label are hidden.
+// Clicking (or Cmd/Ctrl+K) still opens the search popup.
+.search > .search-button {
+  --search-icon: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLXNlYXJjaC1pY29uIGx1Y2lkZS1zZWFyY2giPjxwYXRoIGQ9Im0yMSAyMS00LjM0LTQuMzQiLz48Y2lyY2xlIGN4PSIxMSIgY3k9IjExIiByPSI4Ii8+PC9zdmc+);
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  background: var(--quartz-icon-color) !important;
+  -webkit-mask-image: var(--search-icon);
+  mask-image: var(--search-icon);
+
+  > svg,
+  > p {
+    display: none !important;
+  }
 }
 
 // ─── Tooltips ─────────────────────────────────────────────────────────────────
@@ -191,12 +241,26 @@ div:has(> .readermode:hover) {
   }
 }
 
-// Graph icon tooltip — inside .graph-outer (position:relative, overflow:hidden)
-.graph > .graph-outer:has(.global-graph-icon:hover)::after {
+// The search button's parent is .search (inside the flex wrapper div), so the
+// tooltip goes there. Its popup is position:fixed, so position:relative is harmless.
+.search:has(> .search-button:hover) {
+  position: relative;
+  &::after {
+    @include tooltip-base;
+    content: "Search";
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+// Graph button's parent is .graph-outer (position:relative from the plugin).
+.graph > .graph-outer:has(> .global-graph-icon:hover)::after {
   @include tooltip-base;
   content: "Global graph";
-  top: 30px;
-  right: 4px;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 // Copy button tooltip — pre is position:relative, button is top-right corner
@@ -246,7 +310,7 @@ pre:has(> .clipboard-button:hover)::after {
 
 html[saved-theme="dark"] .page-title::before,
 html[saved-theme="dark"] .terminal-cursor {
-  color: #4caf50;
+  color: #b1ff07;
 }
 
 // ─── Sidebar header fonts ─────────────────────────────────────────────────────
@@ -362,7 +426,7 @@ html[saved-theme="dark"] .explorer-content ul li > a.active,
 html[saved-theme="dark"] .explorer-content ul li > a.is-active,
 html[saved-theme="dark"] .explorer-content a.folder-button.active,
 html[saved-theme="dark"] .explorer-content button.folder-button.active {
-  color: #4caf50 !important;
+  color: #9fef00f0 !important;
   opacity: 1 !important;
   font-weight: 600 !important;
 }
@@ -537,6 +601,28 @@ li:has(> a.internal.tag-link[href$="/file-icon"]) {
   display: none !important;
 }
 
+// ─── Explorer empty folders ───────────────────────────────────────────────────
+// A folder whose only page is its index.md (e.g. notes/ while it's WIP) has an
+// empty child list, but its toggle (.folder-icon, invisible over the folder
+// icon) still flips it to Shadeflow's "open" icon and saves that in
+// localStorage "fileTree", so it looks stuck open with nothing inside.
+// So until the folder has pages: show the closed icon except while you're on the
+// folder's own page (.active), where it shows open like any other folder, and
+// ignore toggle clicks.
+// !important beats Shadeflow's (non-important) open rule; :where() keeps
+// specificity at (0,0,1) so the file-icon plugin's !important injected rules
+// still win and empty file-icon folders (e.g. FIRST robotics) keep their icon.
+// Only the icon shape is overridden; the color comes from the same rule as every
+// other explorer icon.
+:where(li:has(> .folder-outer > ul:empty) > .folder-container:not(:has(.active)))::before {
+  mask-image: var(--folder-closed-icon) !important;
+  -webkit-mask-image: var(--folder-closed-icon) !important;
+}
+
+li:has(> .folder-outer > ul:empty) > .folder-container > .folder-icon {
+  pointer-events: none;
+}
+
 // ─── Mobile: contacts + explorer drawer fixes ─────────────────────────────────
 // The contacts plugin has no mobile=false guard so it appears in the mobile
 // header row, overlapping the toolbar buttons. Hide it there — contact links
@@ -550,6 +636,13 @@ li:has(> a.internal.tag-link[href$="/file-icon"]) {
   // z-index:101 and can overlap the first item. Push content down a bit more.
   .explorer .explorer-content {
     padding-top: 5.5rem !important;
+  }
+
+  // Shadeflow adds 0.5rem start padding to both .folder-container and every
+  // explorer <a>, so folder names sit 0.5rem right of file names (e.g. About).
+  // Drop it from the link inside a folder row; the row's padding remains.
+  .explorer .explorer-content .folder-container a.folder-button {
+    padding-inline-start: 0 !important;
   }
 }
 

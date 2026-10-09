@@ -5,7 +5,7 @@ tags:
   - notes
 ---
 
-this section is a WIP
+this section is a work in a progress :c
 
 <figure style="text-align: center;">
 <img src="./IMG_2337.JPG" alt="v0" style="width: min(398px, 100%);" />

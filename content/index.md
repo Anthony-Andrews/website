@@ -1,5 +1,5 @@
 ---
-title: Portfolio
+title: About
 description: A Portfolio of my Projects.
 ---
 
@@ -33,8 +33,8 @@ This site serves as documentation of projects and notes.
 <a href="projects/03-old/"><img src="./fpv.JPG" alt="FPV Drone" style="width: min(300px, 40%);" /></a>
 <a href="projects/03-old/"><img src="./cnc.jpeg" alt="DIY CNC router" style="width: min(300px, 40%);" /></a>
 
-### **[Miscellaneous](projects/)**
-<span style="margin-top: -0.75rem; display: block;">self-built CNCs, e-bikes, etc.</span>
+### **[Legacy projects](projects/03-old/)**
+<span style="margin-top: -0.75rem; display: block;">Small projects with little documentation</span>
 
 ---
 

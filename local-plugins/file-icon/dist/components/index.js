@@ -36,7 +36,7 @@ var beforeDOMLoadedScript = `
         'html[saved-theme="light"] ' + s + ' .folder-button.active,' +
         'html[saved-theme="light"] ' + s + ' .folder-button.active .folder-title{color:#f4a261!important;opacity:1!important;font-weight:600!important}' +
         'html[saved-theme="dark"] ' + s + ' .folder-button.active,' +
-        'html[saved-theme="dark"] ' + s + ' .folder-button.active .folder-title{color:#4caf50!important;opacity:1!important;font-weight:600!important}';
+        'html[saved-theme="dark"] ' + s + ' .folder-button.active .folder-title{color:#b1ff07!important;opacity:1!important;font-weight:600!important}';
     }).join('');
     var el = document.createElement('style');
     el.id = 'file-icon-style';
@@ -58,7 +58,7 @@ var afterDOMLoadedScript = `
         'html[saved-theme="light"] ' + s + ' .folder-button.active,' +
         'html[saved-theme="light"] ' + s + ' .folder-button.active .folder-title{color:#f4a261!important;opacity:1!important;font-weight:600!important}' +
         'html[saved-theme="dark"] ' + s + ' .folder-button.active,' +
-        'html[saved-theme="dark"] ' + s + ' .folder-button.active .folder-title{color:#4caf50!important;opacity:1!important;font-weight:600!important}';
+        'html[saved-theme="dark"] ' + s + ' .folder-button.active .folder-title{color:#b1ff07!important;opacity:1!important;font-weight:600!important}';
     }).join('');
   }
   function injectFileIconStyle(paths) {

@@ -167,17 +167,21 @@ plugins:
         fontSize: 1.0
       globalGraph:
         fontSize: 1.0
+    # Only the global-graph button is shown (custom.scss hides the local graph).
     layout:
-      position: right
-      priority: 10
+      position: left
+      priority: 40
+      group: toolbar
   - source: github:quartz-community/search
     enabled: true
     layout:
       position: left
       priority: 20
       group: toolbar
-      groupOptions:
-        grow: true
+      # Search is styled as an icon-only button in custom.scss, so it no longer
+      # stretches to fill the toolbar row.
+      # groupOptions:
+      #   grow: true
   - source: github:quartz-community/backlinks
     enabled: false
     layout:
@@ -190,6 +194,10 @@ plugins:
       priority: 10
   - source: github:quartz-community/content-meta
     enabled: true
+    # "x min read" is off by default; add `readingTime: true` to a page's
+    # frontmatter to show it (patched in local-plugins/quartz-plugins/content-meta).
+    options:
+      showReadingTime: false
     layout:
       position: beforeBody
       priority: 20
@@ -200,7 +208,7 @@ plugins:
       position: beforeBody
       priority: 30
   - source: github:quartz-community/page-title
-    enabled: true
+    enabled: false
     layout:
       position: left
       priority: 10
@@ -220,6 +228,8 @@ plugins:
       group: toolbar
   - source: github:quartz-community/breadcrumbs
     enabled: true
+    options:
+      rootName: About
     layout:
       position: beforeBody
       priority: 5
@@ -233,11 +243,11 @@ plugins:
       position: afterBody
       priority: 10
   - source: github:quartz-community/footer
-    enabled: false
+    enabled: true
     options:
+      # Link text is the key's fingerprint; content/pgp.asc is the exported public key.
       links:
-        GitHub: https://github.com/jackyzha0/quartz
-        Discord Community: https://discord.gg/cRFFHYye7t
+        "PGP: 3278 12B8 0A3B 9774 008A  3DF7 4918 7E5B 9A75 D8A9": /pgp.asc
   - source: github:quartz-community/recent-notes
     enabled: false
   - source: github:quartz-community/spacer

@@ -2,4 +2,8 @@
 
 Website: [aandrews.io](https://aandrews.io)
 
-build with ```npx quartz build --serve``` view at http://localhost:8080
+# notes for future me:
+
+install preqrequisites with ```npm i && npx quartz plugin install```
+
+build with ```npm run apply-patches && npx quartz build --serve``` view at http://localhost:8080
