@@ -1,8 +1,0 @@
-/* THANKS */
-
-	Quartz static-site generator: Jacky Zhao
-    https://github.com/jackyzha0/quartz
-
-
-gratitude for the humans, not the robots
-- anthony
