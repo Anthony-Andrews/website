@@ -1,0 +1,10 @@
+{
+  // Must match the Worker's name in the Cloudflare dashboard.
+  "name": "website",
+  "compatibility_date": "2026-11-18",
+  // Serve the Quartz build output as a static site.
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page",
+  },
+}
